@@ -4,12 +4,34 @@
 <meta charset="UTF-8">
 <title>Todos Preview - day04</title>
 <style>
-  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; }
+  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; color: #222; }
   h1 { font-size: 1.3rem; }
-  ul { list-style: none; padding: 0; }
-  li { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 8px; }
-  li .field { font-size: 0.85rem; }
-  li .field b { color: #555; }
+  ul { list-style: none; padding: 0; margin: 16px 0 0; }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fafafa;
+  }
+  li.done { opacity: 0.55; }
+  li .checkbox { flex-shrink: 0; width: 18px; height: 18px; accent-color: #4a7dff; }
+  li .content { flex: 1; min-width: 0; }
+  li .title { font-weight: 600; }
+  li.done .title { text-decoration: line-through; }
+  li .meta { font-size: 0.8rem; color: #888; margin-top: 2px; }
+  li .amount {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    color: #4a7dff;
+    font-weight: 600;
+    background: #eef2ff;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
   #status { color: #888; }
 </style>
 </head>
@@ -49,15 +71,39 @@
       statusEl.remove();
       todos.forEach(todo => {
         const li = document.createElement("li");
-        Object.entries(todo).forEach(([key, value]) => {
-          const div = document.createElement("div");
-          div.className = "field";
-          const b = document.createElement("b");
-          b.textContent = key + ": ";
-          div.appendChild(b);
-          div.appendChild(document.createTextNode(String(value)));
-          li.appendChild(div);
-        });
+        if (todo.done) li.classList.add("done");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "checkbox";
+        checkbox.checked = !!todo.done;
+        checkbox.disabled = true;
+        li.appendChild(checkbox);
+
+        const content = document.createElement("div");
+        content.className = "content";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = todo.title ?? "(제목 없음)";
+        content.appendChild(title);
+
+        if (todo.due_date) {
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = "마감일: " + todo.due_date;
+          content.appendChild(meta);
+        }
+
+        li.appendChild(content);
+
+        if (todo.amount !== undefined && todo.amount !== null) {
+          const amount = document.createElement("div");
+          amount.className = "amount";
+          amount.textContent = todo.amount + "개";
+          li.appendChild(amount);
+        }
+
         listEl.appendChild(li);
       });
     } catch (err) {
