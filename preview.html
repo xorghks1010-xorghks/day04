@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Todos Preview - day04</title>
+<style>
+  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; }
+  h1 { font-size: 1.3rem; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 8px; }
+  li .field { font-size: 0.85rem; }
+  li .field b { color: #555; }
+  #status { color: #888; }
+</style>
+</head>
+<body>
+<h1>Todos</h1>
+<p id="status">불러오는 중...</p>
+<ul id="todo-list"></ul>
+
+<script>
+  const SUPABASE_URL = "https://sckaxhkmiskfvvkyycli.supabase.co/rest/v1/";
+  const SUPABASE_ANON_KEY = "sb_publishable_GP73LVQtHJYuB6dB13KmXQ_jGZDB_2Q";
+
+  async function loadTodos() {
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("todo-list");
+
+    try {
+      const res = await fetch(SUPABASE_URL + "test_todos?select=*", {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+
+      const todos = await res.json();
+
+      if (todos.length === 0) {
+        statusEl.textContent = "등록된 항목이 없습니다.";
+        return;
+      }
+
+      statusEl.remove();
+      todos.forEach(todo => {
+        const li = document.createElement("li");
+        Object.entries(todo).forEach(([key, value]) => {
+          const div = document.createElement("div");
+          div.className = "field";
+          const b = document.createElement("b");
+          b.textContent = key + ": ";
+          div.appendChild(b);
+          div.appendChild(document.createTextNode(String(value)));
+          li.appendChild(div);
+        });
+        listEl.appendChild(li);
+      });
+    } catch (err) {
+      statusEl.textContent = "불러오기 실패: " + err.message;
+    }
+  }
+
+  loadTodos();
+</script>
+</body>
+</html>

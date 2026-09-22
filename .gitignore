@@ -1,0 +1,8 @@
+# secrets
+supabase 비밀번호.txt
+*.env
+.env
+.env.*
+*비밀번호*
+*password*
+*secret*
